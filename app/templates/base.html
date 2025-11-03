@@ -1,51 +1,53 @@
-
 <!doctype html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}App MVC{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-    <style>
-      body { padding-top: 2rem; }
-      .container { max-width: 720px; margin: 0 auto; }
-      .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
-      .card { padding: 1rem; border: 1px solid #e5e7eb; border-radius: 12px; }
-      .center { display:flex; align-items:center; justify-content:center; min-height:60vh; }
-    </style>
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-  <body>
-    <nav class="container">
-      <ul>
-        <li><strong>App MVC</strong></li>
-      </ul>
-      <ul>
-        {% if current_user.is_authenticated %}
-        <li>{{ current_user.email }}</li>
-        <li><a href="{{ url_for('main.menu') }}">Menú</a></li>
-        <li><a href="{{ url_for('auth.logout') }}">Salir</a></li>
-        {% else %}
-        <li><a href="{{ url_for('auth.login') }}">Entrar</a></li>
-        {% endif %}
-      </ul>
-    </nav>
+<body>
+    
+    <header class="navbar">
+        <div class="container">
+            <a href="{{ url_for('main.menu') }}" class="navbar-brand">
+                <strong>App MVC</strong>
+            </a>
+            <nav class="navbar-links">
+                {% if current_user.is_authenticated %}
+                    <span>{{ current_user.email }}</span>
+                    <a href="{{ url_for('main.menu') }}">Menú</a>
+                    <a href="{{ url_for('auth.logout') }}">Salir</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}">Entrar</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
     <main class="container">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-          <div role="alert">
+          <div class="flash-messages">
             {% for category, message in messages %}
-              <p><small><strong>{{ category.title() }}:</strong> {{ message }}</small></p>
+              <div class="flash flash-{{ category }}">{{ message }}</div>
             {% endfor %}
           </div>
         {% endif %}
       {% endwith %}
+      
       {% block content %}{% endblock %}
     </main>
-  
-  <script src="{{ url_for('static', filename='js/model.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/view.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/controller.js') }}"></script>
-</body>
+    
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2025 Mi Aplicación Profesional. Todos los derechos reservados.</p>
+        </div>
+    </footer>
 
+  <script src="{{ url_for('static', filename='js/model.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/view.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/controller.js') }}" defer></script>
+</body>
 </html>

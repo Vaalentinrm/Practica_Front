@@ -1,68 +1,54 @@
-// controller.js - orquesta eventos y conecta model + view
+// app/static/js/controller.js
+
 const Controller = (function(Model, View){
-    function init(){
-        // Registro: validación de contraseñas
-        const form = document.querySelector('.register-form');
-        const password = document.getElementById('password');
-        const confirmPassword = document.getElementById('confirmPassword');
-        if(form && confirmPassword){
-            confirmPassword.addEventListener('input', () => confirmPassword.setCustomValidity(''));
-            form.addEventListener('submit', function (e) {
-                if (password.value !== confirmPassword.value) {
-                    e.preventDefault();
-                    confirmPassword.setCustomValidity("Las contraseñas no coinciden");
-                    confirmPassword.reportValidity();
-                } else {
-                    confirmPassword.setCustomValidity('');
-                }
-            });
+    
+    /**
+     * Función principal de inicialización.
+     * Se ejecuta cuando el DOM está listo.
+     */
+    async function init() {
+        console.log("Controlador inicializado.");
+        
+        // 1. Buscamos el contenedor en el HTML
+        const productListContainer = document.getElementById('product-list-container');
+        
+        // 2. Si existe (es decir, estamos en la página de productos)...
+        if(productListContainer){
+            // 3. Pedimos los datos al Modelo (que llamará a la API)
+            const products = await Model.getProducts();
+            
+            // 4. Le pasamos los datos a la Vista para que "pinte" el HTML
+            View.renderProductList(productListContainer, products);
+            
+            // 5. Añadimos los event listeners
+            setupEventListeners(productListContainer);
         }
 
-        // Popup términos + cookies
-        const popup = document.getElementById('termsCookiesPopup');
-        const content = document.getElementById('termsCookiesContent');
-        const acceptBtn = document.getElementById('acceptTermsCookiesBtn');
-        if(popup){
-            if (!localStorage.getItem('acceptedTermsCookies')) {
-                popup.style.display = 'flex';
-            }
-            if(content){
-                content.addEventListener('scroll', () => {
-                    if (content.scrollTop + content.clientHeight >= content.scrollHeight) {
-                        acceptBtn.disabled = false;
-                    }
-                });
-            }
-            if(acceptBtn){
-                acceptBtn.addEventListener('click', () => {
-                    localStorage.setItem('acceptedTermsCookies', 'true');
-                    popup.style.display = 'none';
-                });
-            }
-        }
-
-        // Productos list
-        const productList = document.getElementById('productList');
-        if(productList){
-            View.renderProductList(productList, Model.getProducts());
-            productList.addEventListener('click', e => {
-                const target = e.target;
-                if (target.classList.contains('toggle-details')) {
-                    const details = target.nextElementSibling;
-                    details.classList.toggle('d-none');
-                }
-                if (target.classList.contains('remove-btn')) {
-                    const card = target.closest('.card');
-                    const id = parseInt(card.dataset.productId);
-                    Model.removeProductById(id);
-                    card.remove();
-                }
-            });
-        }
+        // Aquí puedes inicializar otras cosas (ej. popup de cookies)
     }
 
-    return { init };
-})(Model, View);
+    /**
+     * Configura los manejadores de eventos para la lista de productos
+     */
+    function setupEventListeners(container) {
+        container.addEventListener('click', e => {
+            const target = e.target;
+            
+            // Ejemplo: si hacemos clic en un botón de "eliminar"
+            if (target.classList.contains('remove-btn')) {
+                // Prevenimos que el link '#' navegue
+                e.preventDefault(); 
+                
+                const card = target.closest('.card');
+                const id = card.dataset.productId;
+                console.log(`Intentando eliminar producto con ID: ${id}`);
+                // Aquí llamarías a Model.removeProductById(id)
+                // y luego card.remove() si tiene éxito
+            }
+        });
+    }
 
-// Inicializa cuando DOM esté listo
-document.addEventListener('DOMContentLoaded', Controller.init);
+    // Inicializa el controlador cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', init);
+
+})(Model, View);

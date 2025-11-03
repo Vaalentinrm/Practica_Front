@@ -1,7 +1,7 @@
-
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+# AÑADIDO: 'jsonify' en la importación principal
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
-from ..models import Product, db, User
+from ..models import Product, db, User  # Asegúrate que 'Product' esté aquí
 
 main_bp = Blueprint("main", __name__)
 
@@ -66,5 +66,19 @@ def nuevo():
 @main_bp.route("/productos")
 @login_required
 def productos():
+    # Esta vista ahora solo renderiza el "lienzo" (productos.html).
+    # El JS se encargará de llamar a /api/productos para llenarlo.
+    return render_template("productos.html")
+
+# --- NUEVA RUTA DE API ---
+@main_bp.route("/api/productos")
+@login_required
+def api_productos():
+    """
+    NUEVO: Esta es la API que el frontend (JS) consumirá.
+    Devuelve todos los productos como JSON.
+    """
     items = Product.query.order_by(Product.name.asc()).all()
-    return render_template("productos.html", products=items)
+    # Usamos el método to_dict() que creamos en el modelo
+    lista_productos = [item.to_dict() for item in items]
+    return jsonify(lista_productos)

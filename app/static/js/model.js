@@ -1,18 +1,37 @@
-// model.js - guarda datos y utilidades de negocio (front-end)
+// app/static/js/model.js
+
 const Model = (function(){
-    const products = [
-        { id: 1, name: "Auriculares inalámbricos", price: 49.99, stock: 10, description: "Sonido HD con cancelación de ruido." },
-        { id: 2, name: "Smartwatch deportivo", price: 89.99, stock: 5, description: "Monitor de ritmo cardíaco y sueño." },
-        { id: 3, name: "Teclado mecánico RGB", price: 69.99, stock: 8, description: "Interruptores azules, retroiluminado." }
-    ];
-
-    const formatPrice = price => `€${price.toFixed(2)}`;
-
-    function getProducts() { return products.slice(); }
-    function removeProductById(id){
-        const idx = products.findIndex(p => p.id === id);
-        if(idx !== -1) products.splice(idx,1);
+    
+    /**
+     * Pide los productos a nuestra API del backend.
+     * Es una función 'async' porque 'fetch' tarda un tiempo.
+     */
+    async function getProducts() {
+        try {
+            // Llama a la nueva ruta de API que creamos
+            const response = await fetch('/api/productos');
+            if (!response.ok) {
+                // Si el servidor responde con un error (ej. 404, 500)
+                throw new Error(`Error ${response.status}: No se pudieron cargar los productos.`);
+            }
+            const products = await response.json();
+            return products;
+        } catch (error) {
+            console.error("Error en Model.getProducts:", error);
+            // Devolvemos un array vacío para que la UI no se rompa
+            return [];
+        }
     }
 
-    return { getProducts, formatPrice, removeProductById };
+    /**
+     * Función de utilidad para formatear precios
+     */
+    const formatPrice = price => `€${price.toFixed(2)}`;
+
+    // Exponemos las funciones que el Controlador puede usar
+    return { 
+        getProducts, 
+        formatPrice
+        // (Aquí irían removeProductById, etc., si implementamos el DELETE)
+    };
 })();

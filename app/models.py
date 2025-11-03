@@ -1,7 +1,7 @@
-
 from . import db, login_manager
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import url_for  # <-- AÑADIDO: Arregla el error de importación
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,3 +27,16 @@ class Product(db.Model):
 
     def __repr__(self):
         return f"<Product {self.name} €{self.price:.2f}>"
+
+    def to_dict(self):
+        """
+        NUEVO: Convierte el objeto Product a un diccionario 
+        para enviarlo como JSON a la API.
+        """
+        return {
+            "id": self.id,
+            "name": self.name,
+            "price": self.price,
+            # Usamos url_for para construir la ruta completa al 'static'
+            "image_path": url_for('static', filename=self.image_path)
+        }
