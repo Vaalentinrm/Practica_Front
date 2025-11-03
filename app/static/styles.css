@@ -1,0 +1,191 @@
+/* === E-commerce Moderno === */
+
+/* Fuentes y variables */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root {
+  --primary: #198754;
+  --primary-light: #20c997;
+  --accent: #ff6f00;
+  --bg: #f8f9fa;
+  --text: #212529;
+  --card-bg: #ffffff;
+  --radius: 1rem;
+  --shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+  --primary: #20c997;
+  --accent: #ffa733;
+  --bg: #121212;
+  --text: #e8e8e8;
+  --card-bg: #1e1e1e;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Layout base */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  padding: 2rem 1rem;
+}
+
+nav.navbar {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  color: #fff;
+  padding: 1rem 2rem;
+  z-index: 10;
+  box-shadow: var(--shadow);
+}
+
+nav.navbar a {
+  color: #fff;
+  margin-right: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+nav.navbar a:hover {
+  color: var(--accent);
+}
+
+/* Tarjetas de producto */
+.product-card, .card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.product-card:hover, .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+.product-card img, .card img {
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.card-body {
+  padding: 1.25rem;
+}
+
+/* Botones */
+.btn, button {
+  font-weight: 600;
+  border-radius: 2rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.btn-success, .btn-buy {
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  color: #fff;
+}
+.btn-success:hover, .btn-buy:hover {
+  background: linear-gradient(90deg, var(--primary-light), var(--accent));
+  transform: scale(1.05);
+}
+.btn-outline-danger {
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background: transparent;
+}
+.btn-outline-danger:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Formulario */
+.register-form__input, input, select {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #ccc;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.register-form__input:focus, input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+  outline: none;
+}
+
+.register-form__button, button[type="submit"] {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  color: #fff;
+  font-weight: 600;
+}
+.register-form__button:hover, button[type="submit"]:hover {
+  background: linear-gradient(90deg, var(--accent), var(--primary));
+}
+
+/* Catálogo */
+.catalog, .menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+.product {
+  text-align: center;
+}
+.product h4 {
+  margin: 0.5rem 0;
+}
+.product p {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Popup términos */
+#termsCookiesPopup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+#termsCookiesPopup .popup-inner {
+  background: var(--card-bg);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  max-width: 600px;
+  max-height: 70vh;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+#termsCookiesContent {
+  overflow-y: auto;
+  height: 200px;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  padding: 1rem;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1rem;
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Animaciones */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    scroll-behavior: smooth;
+  }
+}
