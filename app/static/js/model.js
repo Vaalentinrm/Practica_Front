@@ -4,23 +4,53 @@ const Model = (function(){
     
     /**
      * Pide los productos a nuestra API del backend.
-     * Es una función 'async' porque 'fetch' tarda un tiempo.
      */
     async function getProducts() {
-        try {
-            // Llama a la nueva ruta de API que creamos
-            const response = await fetch('/api/productos');
-            if (!response.ok) {
-                // Si el servidor responde con un error (ej. 404, 500)
-                throw new Error(`Error ${response.status}: No se pudieron cargar los productos.`);
-            }
-            const products = await response.json();
-            return products;
-        } catch (error) {
-            console.error("Error en Model.getProducts:", error);
-            // Devolvemos un array vacío para que la UI no se rompa
-            return [];
+        // La API es '/api/productos' definida en main.py
+        const response = await fetch('/api/productos');
+        if (!response.ok) {
+            // Lanza un error para que el Controller lo capture
+            throw new Error(`Error ${response.status}: No se pudieron cargar los productos.`);
         }
+        const products = await response.json();
+        return products;
+    }
+
+    /**
+     * NUEVO: Envía datos de un nuevo producto a la API.
+     * @param {FormData} formData - Los datos del formulario.
+     */
+    async function createProduct(formData) {
+        const response = await fetch('/api/productos', {
+            method: 'POST',
+            body: formData
+            // No 'Content-Type', 'FormData' lo gestiona automáticamente
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) { // 400, 500, etc.
+            // Pasa los errores de validación de WTForms al controller
+            throw new Error(data.errors ? JSON.stringify(data.errors) : 'Error del servidor');
+        }
+        
+        return data; // Devuelve el producto recién creado
+    }
+
+    /**
+     * NUEVO: Pide a la API que borre un producto.
+     * @param {number} id - El ID del producto a borrar.
+     */
+    async function deleteProduct(id) {
+        const response = await fetch(`/api/producto/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('No se pudo eliminar el producto.');
+        }
+        
+        return await response.json(); // Devuelve {success: true}
     }
 
     /**
@@ -28,10 +58,11 @@ const Model = (function(){
      */
     const formatPrice = price => `€${price.toFixed(2)}`;
 
-    // Exponemos las funciones que el Controlador puede usar
+    // Exponemos las funciones
     return { 
-        getProducts, 
+        getProducts,
+        createProduct, // NUEVO
+        deleteProduct, // NUEVO
         formatPrice
-        // (Aquí irían removeProductById, etc., si implementamos el DELETE)
     };
-})();
+})()

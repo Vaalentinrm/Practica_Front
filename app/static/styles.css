@@ -16,6 +16,7 @@
   --shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
+/* ... (El modo oscuro [data-theme="dark"] se mantiene igual) ... */
 [data-theme="dark"] {
   --primary: #20c997;
   --accent: #ffa733;
@@ -39,22 +40,27 @@ body {
   background-color: var(--bg);
   color: var(--text);
   line-height: 1.6;
-  min-height: 100vh;
+  min-height: 100vh; /* Clave para el sticky footer */
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Clave para el sticky footer */
 }
 
 /* === 2. Layout (Contenedor y Header/Footer) === */
 .container {
   max-width: 960px;
-  margin: 0 auto;
-  padding: 0 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  width: 100%; /* Asegura que ocupe el espacio en móviles */
 }
 
 main.container {
   flex-grow: 1; /* Empuja el footer hacia abajo */
   padding-top: 2rem;
   padding-bottom: 2rem;
+  display: flex; /* Añadido para centrar contenido verticalmente si es necesario */
+  flex-direction: column; /* Añadido */
 }
 
 .navbar {
@@ -115,7 +121,8 @@ main.container {
   padding: 2rem 0;
   text-align: center;
   font-size: 0.9rem;
-  margin-top: 2rem;
+  margin-top: 2rem; /* Separación del contenido */
+  flex-shrink: 0; /* Evita que el footer se encoja */
 }
 
 /* === 3. Componentes (Tarjetas, Formularios, Botones) === */
@@ -164,22 +171,35 @@ h2 {
   gap: 1.5rem;
 }
 
-/* Formularios */
-form {
-  max-width: 480px;
+/* Formularios (NUEVO Y MEJORADO) */
+.form-container {
   background: var(--card-bg);
   padding: 2rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  margin-left: auto;  /* Centra el formulario */
+  margin-right: auto; /* Centra el formulario */
 }
-.center form {
-  margin: 0 auto;
+
+.form-narrow {
+  max-width: 400px; /* Para login */
+}
+
+.form-medium {
+  max-width: 520px; /* Para otros formularios */
 }
 
 form label {
   display: block;
   font-weight: 600;
   margin-bottom: 0.5rem;
+}
+
+form p small {
+  display: block;
+  margin-top: 1rem;
+  color: var(--text-light);
+  text-align: center;
 }
 
 input[type="text"],
@@ -253,10 +273,125 @@ a[role="button"].secondary:hover {
 .flash-warning { background-color: #fff3cd; color: #664d03; border-color: #ffecb5;}
 
 /* Utilidad para centrar (usada en Login) */
-.center {
+.center-page-content {
+  display: flex;
+  align-items: center; /* Centra verticalmente */
+  justify-content: center; /* Centra horizontalmente */
+  flex-grow: 1; /* Ocupa el espacio disponible */
+  padding: 2rem 0;
+}
+
+
+.theme-switch {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-grow: 1;
-  padding: 2rem 0;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+.theme-switch:hover {
+  color: var(--primary);
+}
+.theme-switch-toggle {
+  background: var(--border-color);
+  width: 40px;
+  height: 20px;
+  border-radius: 10px;
+  position: relative;
+  transition: background-color 0.2s;
+}
+.theme-switch-toggle::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+}
+[data-theme="dark"] .theme-switch-toggle {
+  background: var(--primary);
+}
+[data-theme="dark"] .theme-switch-toggle::before {
+  transform: translateX(20px);
+}
+
+/* --- Esqueleto de Carga (Skeleton) --- */
+@keyframes pulse {
+  0% { background-color: var(--border-color); }
+  50% { background-color: var(--bg); }
+  100% { background-color: var(--border-color); }
+}
+.skeleton-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+.skeleton-card .img {
+  width: 100%;
+  height: 140px;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.skeleton-card .line {
+  height: 1.2rem;
+  margin-top: 1rem;
+  width: 90%;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.skeleton-card .line-short {
+  width: 60%;
+  height: 1rem;
+  margin-top: 0.75rem;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* --- Botón de Borrado en Tarjeta --- */
+.card .card-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+.delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  transition: color 0.2s, background-color 0.2s;
+}
+.delete-btn:hover {
+  color: #dc3545; /* Rojo peligro */
+  background-color: #f8d7da; /* Fondo rojo claro */
+}
+.delete-btn svg {
+  width: 16px;
+  height: 16px;
+  pointer-events: none; /* Para que el clic vaya al botón */
+}
+
+/* --- Mensajes de Formulario API --- */
+.form-message {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  font-weight: 500;
+  display: none; /* Oculto por defecto */
+}
+.form-message.success {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  display: block;
+}
+.form-message.error {
+  background-color: #f8d7da;
+  color: #842029;
+  display: block;
 }
