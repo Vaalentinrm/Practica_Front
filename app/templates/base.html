@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="es"> <head>
+<html lang="es">
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}App MVC{% endblock %}</title>
@@ -37,22 +38,30 @@
         </div>
     </header>
 
-    ```
+    <main class="container">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
 
-#### `app/templates/productos.html` (Actualizado)
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2025 App MVC. Proyecto de ejemplo.</p>
+        </div>
+    </footer>
 
-Cambiamos el "Cargando..." por un `div` que nuestro JS usará para los esqueletos.
+    <script src="{{ url_for('static', filename='js/model.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/view.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/controller.js') }}"></script>
 
-```html
-{% extends "base.html" %}
-{% block title %}Productos{% endblock %}
-{% block content %}
-  <h2>Productos</h2>
-  
-  <div id="product-list-container" class="menu-grid">
-    </div>
-
-  <p style="margin-top: 2rem;">
-    <a href="{{ url_for('main.nuevo') }}" role="button">Crear nuevo producto</a>
-  </p>
-{% endblock %}
+</body>
+</html>

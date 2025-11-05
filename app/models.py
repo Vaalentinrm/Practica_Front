@@ -1,7 +1,7 @@
 from . import db, login_manager
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import url_for  # <-- AÑADIDO: Arregla el error de importación
+# ELIMINAMOS 'from flask import url_for' DE AQUÍ. ESA ERA LA CAUSA DEL ERROR.
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,13 +30,15 @@ class Product(db.Model):
 
     def to_dict(self):
         """
-        NUEVO: Convierte el objeto Product a un diccionario 
+        Convierte el objeto Product a un diccionario 
         para enviarlo como JSON a la API.
         """
+        # --- ESTA ES LA CORRECCIÓN ---
+        # No usamos 'url_for'. Simplemente construimos la ruta estática
+        # que el navegador ya entiende.
         return {
             "id": self.id,
             "name": self.name,
             "price": self.price,
-            # Usamos url_for para construir la ruta completa al 'static'
-            "image_path": url_for('static', filename=self.image_path)
+            "image_path": f"/static/{self.image_path}"
         }
