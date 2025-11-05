@@ -59,6 +59,26 @@
         </div>
     </footer>
 
+    <div id="notification-container"></div>
+
+    <div class="modal-overlay" 
+         id="confirm-modal-overlay"
+         role="dialog"
+         aria-modal="true"
+         aria-hidden="true" 
+         aria-labelledby="confirm-modal-title"
+         aria-describedby="confirm-modal-message">
+         
+        <div class="modal-content">
+            <h3 id="confirm-modal-title">Confirmar acción</h3>
+            <p id="confirm-modal-message">¿Estás seguro?</p>
+            
+            <div class="modal-actions">
+                <button class="btn-secondary" id="confirm-modal-cancel">Cancelar</button>
+                <button class="btn-danger" id="confirm-modal-confirm">Confirmar</button>
+            </div>
+        </div>
+    </div>
     <script src="{{ url_for('static', filename='js/model.js') }}"></script>
     <script src="{{ url_for('static', filename='js/view.js') }}"></script>
     <script src="{{ url_for('static', filename='js/controller.js') }}"></script>

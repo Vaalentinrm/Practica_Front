@@ -5,12 +5,15 @@
 <div class="center-page-content">
   <form method="post" action="{{ url_for('auth.login') }}" class="form-container form-narrow">
     <h3 style="text-align: center; margin-bottom: 1.5rem;">Iniciar sesión</h3>
+    
     <label>Email
-      <input type="email" name="email" placeholder="tú@ejemplo.com" required />
+      <input type="email" name="email" placeholder="tú@ejemplo.com" required autocomplete="email" />
     </label>
+    
     <label>Password
-      <input type="password" name="password" placeholder="••••••••" required />
+      <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password" />
     </label>
+    
     <button type="submit">Entrar</button>
     <p><small>Usuario por defecto: admin@example.com / admin123</small></p>
   </form>

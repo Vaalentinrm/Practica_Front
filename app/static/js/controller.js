@@ -6,7 +6,7 @@ const Controller = (function(Model, View){
      * Función principal de inicialización.
      */
     function init() {
-        console.log("Controlador profesional inicializado.");
+        console.log("Controlador profesional (v2) inicializado.");
         
         // 1. Configurar el modo oscuro en todas las páginas
         setupThemeSwitcher();
@@ -15,98 +15,112 @@ const Controller = (function(Model, View){
         const productListContainer = document.getElementById('product-list-container');
         if(productListContainer){
             loadProducts(productListContainer);
-            setupProductEventListeners(productListContainer);
+            setupProductEventListeners(productListContainer); // <- Este ahora es 'async'
         }
 
         // 3. Lógica de la página "Nuevo"
         const newProductForm = document.getElementById('form-nuevo-producto');
         if (newProductForm) {
-            setupNewProductForm(newProductForm);
+            setupNewProductForm(newProductForm); // <- Este ahora usa 'toasts'
         }
     }
 
     /**
-     * NUEVO: Carga los productos con estado de carga
+     * Carga los productos con estado de carga
      */
     async function loadProducts(container) {
-        // 1. Mostrar estado de carga "esqueleto"
         View.renderLoading(container);
-        
         try {
-            // 2. Simular un retraso para ver el esqueleto (opcional, pero bueno para demo)
             await new Promise(res => setTimeout(res, 500)); 
-            
-            // 3. Pedir datos al Modelo
             const products = await Model.getProducts();
-            
-            // 4. Pintar los datos reales
             View.renderProductList(container, products);
-            
         } catch (error) {
             console.error("Error en loadProducts:", error);
-            // 5. Mostrar error si la API falla
             View.renderError(container, error.message);
         }
     }
 
     /**
      * Configura los manejadores de eventos para la lista de productos
+     * ****** ACTUALIZADO: Ahora es 'async' para usar el modal ******
      */
     function setupProductEventListeners(container) {
+        
+        // Hacemos el listener 'async' para poder usar 'await'
         container.addEventListener('click', async (e) => {
             const target = e.target;
             
-            // NUEVO: Lógica de borrado
+            // Lógica de borrado
             if (target.classList.contains('delete-btn')) {
                 e.preventDefault(); 
                 
                 const card = target.closest('.card');
                 const id = card.dataset.productId;
                 
-                if (confirm(`¿Seguro que quieres eliminar el producto con ID: ${id}?`)) {
+                // Sacamos el nombre del producto de la tarjeta para el modal
+                const productName = card.querySelector('h4').textContent;
+                
+                // ****** REEMPLAZO DEL 'confirm()' NATIVO ******
+                // 1. Mostramos el modal y esperamos la respuesta (true/false)
+                const confirmed = await View.showDeleteModal(
+                    'Confirmar borrado', 
+                    `¿Seguro que quieres eliminar el producto "${productName}"?`
+                );
+
+                // 2. Si el usuario confirmó...
+                if (confirmed) {
                     try {
                         await Model.deleteProduct(id);
                         View.removeCard(id); // Elimina del DOM
+                        
+                        // 3. Mostramos una notificación "Toast"
+                        View.showNotification('Producto eliminado con éxito', 'info');
+                        
                     } catch (error) {
-                        alert(error.message); // Muestra error
+                        // 4. Mostramos error si falla la API
+                        View.showNotification(error.message, 'error');
                     }
                 }
+                // Si 'confirmed' es false, no hacemos nada (el modal se cerró)
             }
         });
     }
 
     /**
-     * NUEVO: Configura el formulario de "Nuevo Producto" para AJAX
+     * Configura el formulario de "Nuevo Producto" para AJAX
+     * ****** ACTUALIZADO: Usa notificaciones "Toast" ******
      */
     function setupNewProductForm(form) {
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Previene el envío HTML
-            View.clearFormMessage();
+            e.preventDefault();
+            View.clearFormMessage(); // Limpia mensajes de formulario antiguos (si los hubiera)
             
             const submitButton = document.getElementById('submit-button');
-            submitButton.disabled = true; // Previene doble clic
+            submitButton.disabled = true;
             submitButton.textContent = 'Enviando...';
 
             const formData = new FormData(form);
 
             try {
-                // Llama al Modelo para usar la API POST
                 const newProduct = await Model.createProduct(formData);
                 
-                View.showFormMessage(`¡Producto "${newProduct.name}" creado con éxito!`, 'success');
-                form.reset(); // Limpia el formulario
+                // ****** NUEVO: Notificación Toast de éxito ******
+                View.showNotification(`¡Producto "${newProduct.name}" creado!`, 'success');
+                form.reset();
 
             } catch (error) {
                 console.error(error.message);
-                // Muestra errores de validación de WTForms
                 let errorMsg = 'Error al crear el producto. Revisa los campos.';
-                if (error.message.includes('{')) { // Es un JSON de errores
+                
+                if (error.message.includes('{')) {
                     const errors = JSON.parse(error.message);
-                    errorMsg = Object.values(errors).map(err => err[0]).join('<br>');
+                    errorMsg = Object.values(errors).map(err => err[0]).join('; ');
                 }
-                View.showFormMessage(errorMsg, 'error');
+                
+                // ****** NUEVO: Notificación Toast de error ******
+                View.showNotification(errorMsg, 'error');
+                
             } finally {
-                // Reactiva el botón
                 submitButton.disabled = false;
                 submitButton.textContent = 'Crear';
             }
@@ -114,7 +128,7 @@ const Controller = (function(Model, View){
     }
 
     /**
-     * NUEVO: Configura el interruptor de modo oscuro
+     * Configura el interruptor de modo oscuro
      */
     function setupThemeSwitcher() {
         const switcher = document.getElementById('theme-switcher');
@@ -129,7 +143,7 @@ const Controller = (function(Model, View){
         });
     }
 
-    // Inicializa el controlador cuando el DOM esté listo
+    // Inicializa el controlador
     document.addEventListener('DOMContentLoaded', init);
 
-})(Model, View)
+})(Model, View);
